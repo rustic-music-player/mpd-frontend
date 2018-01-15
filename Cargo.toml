@@ -1,0 +1,15 @@
+[package]
+name = "rustic-mpd-frontend"
+version = "0.1.0"
+authors = ["Max Jöhnk <maxjoehnk@gmail.com>"]
+
+[dependencies]
+serde = "1.0"
+serde_derive = "1.0"
+slog = "2.1.1"
+
+[dependencies.rustic-core]
+git = "https://github.com/rustic-music-player/core"
+
+[dependencies.serde_mpd]
+git = "https://github.com/rustic-music-player/serde_mpd"
