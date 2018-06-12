@@ -4,13 +4,12 @@ extern crate serde_derive;
 extern crate serde_mpd;
 extern crate rustic_core;
 #[macro_use]
-extern crate slog;
+extern crate log;
 extern crate failure;
 
 mod commands;
 mod song;
 
-use rustic_core::logger::logger;
 use rustic_core::Rustic;
 use rustic_core::bus;
 
@@ -29,10 +28,10 @@ pub struct MpdConfig {
 
 fn open(config: &MpdConfig, app: Arc<Rustic>) -> Result<(), failure::Error> {
     let listener = TcpListener::bind(format!("{}:{}", config.ip, config.port))?;
-    info!(logger, "[MPD] Listening on Port {}", config.port);
+    info!("Listening on Port {}", config.port);
 
     for stream in listener.incoming() {
-        debug!(logger, "[MPD] Connection opened");
+        debug!("Connection opened");
 
         let app = app.clone();
 
@@ -57,8 +56,8 @@ fn handle_client(stream: TcpStream, app: &Arc<Rustic>) {
     let header = "OK MPD 0.16.0\n";
     let result = reader.get_ref().write(header.as_bytes());
     match result {
-        Ok(_) => trace!(logger, "< {:?}", &header),
-        Err(e) => error!(logger, "[MPD] {:?}", &e)
+        Ok(_) => trace!("< {:?}", &header),
+        Err(e) => error!("{:?}", &e)
     }
 
     let events: Arc<Mutex<Vec<bus::Message>>> = Arc::new(Mutex::new(vec![]));
@@ -79,17 +78,17 @@ fn handle_client(stream: TcpStream, app: &Arc<Rustic>) {
                 let res: Result<Option<()>, failure::Error> = line
                     .map_err(failure::Error::from)
                     .and_then(|line| {
-                        trace!(logger, "> {:?}", &line);
+                        trace!("> {:?}", &line);
                         let cmd: Result<MpdCommands, failure::Error> = if line == "command_list_ok_begin" {
                             let mut current = reader.by_ref().lines().next().expect("line").expect("line");
-                            trace!(logger, "> {:?}", &current);
+                            trace!("> {:?}", &current);
                             let mut cmds: Vec<MpdCommands> = vec![];
                             while current.as_str() != "command_list_end" {
                                 if let Ok(cmd) = parse_single(&current) {
                                     cmds.push(cmd)
                                 }
                                 current = reader.by_ref().lines().next().expect("line").expect("line");
-                                trace!(logger, "> {:?}", &current);
+                                trace!("> {:?}", &current);
                             }
                             Ok(MpdCommands::CommandList(cmds))
                         } else {
@@ -102,7 +101,7 @@ fn handle_client(stream: TcpStream, app: &Arc<Rustic>) {
                                 cmd => {
                                     let mut result = handle_mpd_command(cmd, &app)?;
                                     result += "OK\n";
-                                    trace!(logger, "< {:?}", &result);
+                                    trace!("< {:?}", &result);
                                     reader.get_ref().write_all(result.as_bytes())?;
                                     Ok(Some(()))
                                 }
@@ -113,7 +112,7 @@ fn handle_client(stream: TcpStream, app: &Arc<Rustic>) {
                 match res {
                     Ok(None) => break,
                     Err(err) => {
-                        error!(logger, "[MPD] {:?}", &err);
+                        error!("{:?}", &err);
                         break;
                     },
                     Ok(Some(())) => {}
@@ -123,7 +122,7 @@ fn handle_client(stream: TcpStream, app: &Arc<Rustic>) {
         }
     }
 
-    debug!(logger, "[MPD] Connection closed");
+    debug!("Connection closed");
 }
 
 #[derive(Debug, Deserialize)]
@@ -188,7 +187,7 @@ fn parse_single(line: &str) -> Result<MpdCommands, failure::Error> {
 }
 
 fn handle_mpd_command(cmd: MpdCommands, app: &Arc<Rustic>) -> Result<String, failure::Error> {
-    debug!(logger, "[MPD] Command: {:?}", &cmd);
+    debug!("Command: {:?}", &cmd);
     match cmd {
         MpdCommands::Status => commands::StatusCommand::new().handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
