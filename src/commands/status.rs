@@ -1,4 +1,4 @@
-use error::MpdError;
+use failure::Error;
 use commands::MpdCommand;
 use rustic_core::Rustic;
 use rustic_core::player::PlayerState;
@@ -47,7 +47,7 @@ impl StatusCommand {
 }
 
 impl MpdCommand<StatusResponse> for StatusCommand {
-    fn handle(&self, app: &Arc<Rustic>) -> Result<StatusResponse, MpdError> {
+    fn handle(&self, app: &Arc<Rustic>) -> Result<StatusResponse, Error> {
         let player = app.player.lock().unwrap();
         Ok(StatusResponse {
             volume: player.volume(),

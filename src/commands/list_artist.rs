@@ -1,4 +1,4 @@
-use error::MpdError;
+use failure::Error;
 use commands::MpdCommand;
 use rustic_core::{Rustic, Artist};
 use std::sync::Arc;
@@ -26,7 +26,7 @@ impl ListArtistCommand {
 }
 
 impl MpdCommand<Vec<MpdArtist>> for ListArtistCommand {
-    fn handle(&self, app: &Arc<Rustic>) -> Result<Vec<MpdArtist>, MpdError> {
+    fn handle(&self, app: &Arc<Rustic>) -> Result<Vec<MpdArtist>, Error> {
         let mut artists: Vec<MpdArtist> = app
             .library
             .artists

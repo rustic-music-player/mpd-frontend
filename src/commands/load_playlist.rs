@@ -1,4 +1,4 @@
-use error::MpdError;
+use failure::Error;
 use commands::MpdCommand;
 use rustic_core::Rustic;
 use std::sync::Arc;
@@ -16,7 +16,7 @@ impl LoadPlaylistCommand {
 }
 
 impl MpdCommand<()> for LoadPlaylistCommand {
-    fn handle(&self, app: &Arc<Rustic>) -> Result<(), MpdError> {
+    fn handle(&self, app: &Arc<Rustic>) -> Result<(), Error> {
         let tracks = app
             .library
             .playlists
@@ -28,7 +28,7 @@ impl MpdCommand<()> for LoadPlaylistCommand {
             .unwrap()
             .tracks;
         let mut player = app.player.lock().unwrap();
-        player.queue.add_multiple(tracks);
+        player.queue.add_multiple(&tracks);
         Ok(())
     }
 }

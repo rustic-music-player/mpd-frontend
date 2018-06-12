@@ -1,4 +1,4 @@
-use error::MpdError;
+use failure::Error;
 use commands::MpdCommand;
 use commands::list_playlists::PlaylistEntry;
 use song::MpdSong;
@@ -36,7 +36,7 @@ impl ListInfoCommand {
 type ListInfoResponse = (Vec<PathItem>, Vec<PlaylistEntry>, Vec<MpdSong>);
 
 impl MpdCommand<ListInfoResponse> for ListInfoCommand {
-    fn handle(&self, app: &Arc<Rustic>) -> Result<ListInfoResponse, MpdError> {
+    fn handle(&self, app: &Arc<Rustic>) -> Result<ListInfoResponse, Error> {
         match self.path {
             None => {
                 let explorer = Explorer::new(app.providers.to_vec());
@@ -56,7 +56,7 @@ impl MpdCommand<ListInfoResponse> for ListInfoCommand {
             }
             Some(ref path) => {
                 let mut explorer = Explorer::new(app.providers.to_vec());
-                explorer.navigate_absolute(path.to_owned());
+                explorer.navigate_absolute(path);
                 let path = explorer.path();
                 let folder = explorer.items().unwrap();
                 let folders = folder

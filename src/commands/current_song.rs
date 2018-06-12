@@ -1,4 +1,4 @@
-use error::MpdError;
+use failure::Error;
 use commands::MpdCommand;
 use song::MpdSong;
 use rustic_core::Rustic;
@@ -14,12 +14,11 @@ impl CurrentSongCommand {
 }
 
 impl MpdCommand<Option<MpdSong>> for CurrentSongCommand {
-    fn handle(&self, app: &Arc<Rustic>) -> Result<Option<MpdSong>, MpdError> {
+    fn handle(&self, app: &Arc<Rustic>) -> Result<Option<MpdSong>, Error> {
         let player = app.player.lock().unwrap();
-        let track = match player.queue.current() {
-            Some(track) => Some(MpdSong::from(track.clone())),
-            None => None
-        };
+        let track = player.queue
+            .current()
+            .map(|track| MpdSong::from(track.clone()));
         Ok(track)
     }
 }

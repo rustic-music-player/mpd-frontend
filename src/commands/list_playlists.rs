@@ -1,4 +1,4 @@
-use error::MpdError;
+use failure::Error;
 use commands::MpdCommand;
 use rustic_core::{Rustic, Playlist};
 use std::sync::Arc;
@@ -29,7 +29,7 @@ impl ListPlaylistsCommand {
 }
 
 impl MpdCommand<Vec<PlaylistEntry>> for ListPlaylistsCommand {
-    fn handle(&self, app: &Arc<Rustic>) -> Result<Vec<PlaylistEntry>, MpdError> {
+    fn handle(&self, app: &Arc<Rustic>) -> Result<Vec<PlaylistEntry>, Error> {
         let playlists = app
             .library
             .playlists

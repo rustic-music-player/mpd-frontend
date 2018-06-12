@@ -1,4 +1,4 @@
-use error::MpdError;
+use failure::Error;
 use rustic_core::Rustic;
 use std::sync::Arc;
 
@@ -41,5 +41,5 @@ pub use self::stop::StopCommand;
 pub use self::tagtypes::TagTypesCommand;
 
 pub trait MpdCommand<T> {
-    fn handle(&self, app: &Arc<Rustic>) -> Result<T, MpdError>;
+    fn handle(&self, app: &Arc<Rustic>) -> Result<T, Error>;
 }

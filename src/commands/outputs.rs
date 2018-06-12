@@ -1,4 +1,4 @@
-use error::MpdError;
+use failure::Error;
 use commands::MpdCommand;
 use rustic_core::Rustic;
 use std::sync::Arc;
@@ -23,7 +23,7 @@ impl OutputsCommand {
 }
 
 impl MpdCommand<Vec<OutputEntry>> for OutputsCommand {
-    fn handle(&self, _app: &Arc<Rustic>) -> Result<Vec<OutputEntry>, MpdError> {
+    fn handle(&self, _app: &Arc<Rustic>) -> Result<Vec<OutputEntry>, Error> {
         Ok(vec![
             OutputEntry {
                 id: 0,

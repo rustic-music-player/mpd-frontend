@@ -1,6 +1,5 @@
-use error::MpdError;
+use failure::Error;
 use commands::MpdCommand;
-use song::MpdSong;
 use rustic_core::Rustic;
 use std::sync::Arc;
 
@@ -29,7 +28,7 @@ impl CommandsCommand {
 }
 
 impl MpdCommand<Vec<Command>> for CommandsCommand {
-    fn handle(&self, _app: &Arc<Rustic>) -> Result<Vec<Command>, MpdError> {
+    fn handle(&self, _app: &Arc<Rustic>) -> Result<Vec<Command>, Error> {
         Ok(vec![
             Command::new("status"),
             Command::new("currentsong"),

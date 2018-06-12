@@ -1,4 +1,4 @@
-use error::MpdError;
+use failure::Error;
 use commands::MpdCommand;
 use rustic_core::Rustic;
 use std::sync::Arc;
@@ -26,7 +26,7 @@ impl TagTypesCommand {
 }
 
 impl MpdCommand<Vec<TagType>> for TagTypesCommand {
-    fn handle(&self, _app: &Arc<Rustic>) -> Result<Vec<TagType>, MpdError> {
+    fn handle(&self, _app: &Arc<Rustic>) -> Result<Vec<TagType>, Error> {
         Ok(vec![
             TagType::new("Track"),
         ])
