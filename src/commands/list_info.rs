@@ -2,7 +2,7 @@ use failure::Error;
 use commands::MpdCommand;
 use commands::list_playlists::PlaylistEntry;
 use song::MpdSong;
-use rustic_core::{Rustic, SharedLibrary, Explorer};
+use rustic_core::{Rustic, SharedLibrary, Explorer, Track, Playlist};
 use std::sync::Arc;
 
 #[derive(Serialize)]
@@ -71,17 +71,17 @@ impl MpdCommand<ListInfoResponse> for ListInfoCommand {
                 let items = folder
                     .items
                     .iter()
-                    .filter(|item| item.track.is_some())
+                    .filter(|item| item.is_track())
                     .cloned()
-                    .map(|item| item.track.unwrap())
+                    .map(Track::from)
                     .map(MpdSong::from)
                     .collect();
                 let playlists = folder
                     .items
                     .iter()
-                    .filter(|item| item.playlist.is_some())
+                    .filter(|item| item.is_track())
                     .cloned()
-                    .map(|item| item.playlist.unwrap())
+                    .map(Playlist::from)
                     .map(PlaylistEntry::from)
                     .collect();
                 Ok((folders, playlists, items))
