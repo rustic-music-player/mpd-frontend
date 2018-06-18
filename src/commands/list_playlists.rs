@@ -32,11 +32,8 @@ impl MpdCommand<Vec<PlaylistEntry>> for ListPlaylistsCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<Vec<PlaylistEntry>, Error> {
         let playlists = app
             .library
-            .playlists
-            .read()
-            .unwrap()
-            .iter()
-            .cloned()
+            .get_playlists()?
+            .into_iter()
             .map(PlaylistEntry::from)
             .collect();
         Ok(playlists)

@@ -20,9 +20,7 @@ impl MpdCommand<Vec<MpdSong>> for ListPlaylistInfoCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<Vec<MpdSong>, Error> {
         let playlists = app
             .library
-            .playlists
-            .read()
-            .unwrap();
+            .get_playlists()?;
         let playlist = playlists
             .iter()
             .find(|playlist| playlist.title == self.name);

@@ -19,9 +19,7 @@ impl MpdCommand<()> for LoadPlaylistCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<(), Error> {
         let tracks = app
             .library
-            .playlists
-            .read()
-            .unwrap()
+            .get_playlists()?
             .iter()
             .find(|playlist| playlist.title == self.name)
             .cloned()

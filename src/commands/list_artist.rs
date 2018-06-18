@@ -29,11 +29,8 @@ impl MpdCommand<Vec<MpdArtist>> for ListArtistCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<Vec<MpdArtist>, Error> {
         let mut artists: Vec<MpdArtist> = app
             .library
-            .artists
-            .read()
-            .unwrap()
-            .iter()
-            .cloned()
+            .get_artists()?
+            .into_iter()
             .map(MpdArtist::from)
             .collect();
         let unknown = MpdArtist {

@@ -21,15 +21,13 @@ impl ListInfoCommand {
         }
     }
 
-    fn get_playlists(&self, library: &SharedLibrary) -> Vec<PlaylistEntry> {
-        library
-            .playlists
-            .read()
-            .unwrap()
-            .iter()
-            .cloned()
+    fn get_playlists(&self, library: &SharedLibrary) -> Result<Vec<PlaylistEntry>, Error> {
+        let playlists = library
+            .get_playlists()?
+            .into_iter()
             .map(PlaylistEntry::from)
-            .collect()
+            .collect();
+        Ok(playlists)
     }
 }
 
@@ -51,7 +49,7 @@ impl MpdCommand<ListInfoResponse> for ListInfoCommand {
                         }
                     })
                     .collect();
-                let playlists = self.get_playlists(&app.library);
+                let playlists = self.get_playlists(&app.library)?;
                 Ok((folders, playlists, vec![]))
             }
             Some(ref path) => {
