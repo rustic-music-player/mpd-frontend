@@ -17,8 +17,11 @@ impl ChangeVolumeCommand {
 
 impl MpdCommand<()> for ChangeVolumeCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<(), Error> {
-        let mut player = app.player.lock().unwrap();
-        let volume = (player.volume() as i32 + self.volume).min(100).max(0);
-        player.set_volume(volume as u32)
+        let volume = app.player.volume();
+        let volume_percent = volume * 100f32;
+        let volume_percent = (volume_percent + self.volume as f32).min(100f32).max(0f32);
+        let volume = volume_percent / 100f32;
+
+        app.player.set_volume(volume)
     }
 }

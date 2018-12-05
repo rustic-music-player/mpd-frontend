@@ -25,8 +25,7 @@ impl MpdCommand<()> for LoadPlaylistCommand {
             .cloned()
             .unwrap()
             .tracks;
-        let mut player = app.player.lock().unwrap();
-        player.queue.add_multiple(&tracks);
+        app.player.queue_multiple(&tracks);
         Ok(())
     }
 }

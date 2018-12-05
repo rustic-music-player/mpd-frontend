@@ -48,16 +48,15 @@ impl StatusCommand {
 
 impl MpdCommand<StatusResponse> for StatusCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<StatusResponse, Error> {
-        let player = app.player.lock().unwrap();
         Ok(StatusResponse {
-            volume: player.volume(),
+            volume: (app.player.volume() * 100f32) as u32,
             repeat: false,
             random: false,
             single: false,
             consume: false,
             playlist: 0,
-            playlistlength: player.queue.size(),
-            state: player.state.clone(),
+            playlistlength: app.player.get_queue().len(),
+            state: app.player.state(),
             xfade: 0
         })
     }

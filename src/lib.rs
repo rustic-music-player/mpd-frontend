@@ -11,12 +11,11 @@ mod commands;
 mod song;
 
 use rustic_core::Rustic;
-use rustic_core::bus;
 
 use std::net::{TcpListener, TcpStream};
 use std::io::{Read, Write, BufReader, BufRead};
 use std::thread;
-use std::sync::{Mutex, Arc};
+use std::sync::Arc;
 
 use commands::MpdCommand;
 
@@ -58,17 +57,6 @@ fn handle_client(stream: TcpStream, app: &Arc<Rustic>) {
     match result {
         Ok(_) => trace!("< {:?}", &header),
         Err(e) => error!("{:?}", &e)
-    }
-
-    let events: Arc<Mutex<Vec<bus::Message>>> = Arc::new(Mutex::new(vec![]));
-
-    let mut bus = app.bus.lock().unwrap();
-
-    {
-        let events = events.clone();
-        bus.subscribe(Box::new(move|msg| {
-            events.lock().unwrap().push(msg);
-        }));
     }
 
     loop {

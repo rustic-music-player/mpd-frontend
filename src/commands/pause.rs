@@ -1,6 +1,6 @@
 use failure::Error;
 use commands::MpdCommand;
-use rustic_core::Rustic;
+use rustic_core::{Rustic, player::PlayerState};
 use std::sync::Arc;
 
 pub struct PauseCommand {
@@ -14,7 +14,6 @@ impl PauseCommand {
 
 impl MpdCommand<()> for PauseCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<(), Error> {
-        let mut player = app.player.lock().unwrap();
-        player.pause()
+        app.player.set_state(PlayerState::Pause)
     }
 }

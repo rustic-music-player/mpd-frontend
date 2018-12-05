@@ -14,7 +14,7 @@ impl NextCommand {
 
 impl MpdCommand<()> for NextCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<(), Error> {
-        let mut player = app.player.lock().unwrap();
-        player.next()
+        app.player.next()
+            .map(|_| ())
     }
 }

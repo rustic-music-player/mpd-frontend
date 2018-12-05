@@ -15,10 +15,9 @@ impl CurrentSongCommand {
 
 impl MpdCommand<Option<MpdSong>> for CurrentSongCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<Option<MpdSong>, Error> {
-        let player = app.player.lock().unwrap();
-        let track = player.queue
+        let track = app.player
             .current()
-            .map(|track| MpdSong::from(track.clone()));
+            .map(|track| MpdSong::from(track));
         Ok(track)
     }
 }

@@ -14,7 +14,7 @@ impl PreviousCommand {
 
 impl MpdCommand<()> for PreviousCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<(), Error> {
-        let mut player = app.player.lock().unwrap();
-        player.prev()
+        app.player.prev()
+            .map(|_| ())
     }
 }
