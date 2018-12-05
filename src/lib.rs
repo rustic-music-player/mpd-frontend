@@ -114,61 +114,41 @@ fn handle_client(stream: TcpStream, app: &Arc<Rustic>) {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
 enum MpdCommands {
-    #[serde(rename = "status")]
     Status,
-    #[serde(rename = "currentsong")]
     CurrentSong,
-    #[serde(rename = "commandlist")]
     CommandList(Vec<MpdCommands>),
     #[serde(rename = "plchanges")]
     PlaylistChanges(String),
-    #[serde(rename = "outputs")]
     Outputs,
-    #[serde(rename = "decoders")]
     Decoders,
-    #[serde(rename = "idle")]
     Idle,
-    #[serde(rename = "noidle")]
     NoIdle,
-    #[serde(rename = "listplaylists")]
     ListPlaylists,
-    #[serde(rename = "listplaylist")]
     ListPlaylist(String),
-    #[serde(rename = "listplaylistinfo")]
     ListPlaylistInfo(String),
-    #[serde(rename = "load")]
     LoadPlaylist(String),
     #[serde(rename = "lsinfo")]
     ListInfo(String),
-    #[serde(rename = "next")]
     Next,
-    #[serde(rename = "pause")]
     Pause,
     // Pause(bool), Spec says bool argument exists, ncmpcpp doesn't send it
-    #[serde(rename = "play")]
     Play(u64),
-    #[serde(rename = "previous")]
     Previous,
-    #[serde(rename = "stop")]
     Stop,
-    #[serde(rename = "list")]
     List(String),
-    #[serde(rename = "add")]
     Add(String),
-    #[serde(rename = "addid")]
     AddId(String),
     #[serde(rename = "volume")]
     ChangeVolumeBy(i32),
     #[serde(rename = "setvol")]
     ChangeVolume(u32),
-    #[serde(rename = "commands")]
     Commands,
-    #[serde(rename = "tagtypes")]
     TagTypes,
-    #[serde(rename = "close")]
-    Close
+    Close,
 }
+
 
 fn parse_single(line: &str) -> Result<MpdCommands, failure::Error> {
     Ok(serde_mpd::from_str(line)?)
