@@ -1,8 +1,8 @@
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde_mpd;
 extern crate rustic_core;
+extern crate serde_mpd;
 #[macro_use]
 extern crate log;
 extern crate failure;
@@ -12,17 +12,17 @@ mod song;
 
 use rustic_core::Rustic;
 
+use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{TcpListener, TcpStream};
-use std::io::{Read, Write, BufReader, BufRead};
-use std::thread;
 use std::sync::Arc;
+use std::thread;
 
 use commands::MpdCommand;
 
 #[derive(Deserialize, Clone)]
 pub struct MpdConfig {
     pub ip: String,
-    pub port: i32
+    pub port: i32,
 }
 
 fn open(config: &MpdConfig, app: Arc<Rustic>) -> Result<(), failure::Error> {
@@ -34,7 +34,7 @@ fn open(config: &MpdConfig, app: Arc<Rustic>) -> Result<(), failure::Error> {
 
         let app = app.clone();
 
-        thread::spawn(move|| handle_client(stream.unwrap(), &app));
+        thread::spawn(move || handle_client(stream.unwrap(), &app));
     }
 
     Ok(())
@@ -43,9 +43,9 @@ fn open(config: &MpdConfig, app: Arc<Rustic>) -> Result<(), failure::Error> {
 pub fn start(config: Option<MpdConfig>, app: Arc<Rustic>) -> thread::JoinHandle<()> {
     let config = config.unwrap_or(MpdConfig {
         ip: "0.0.0.0".to_owned(),
-        port: 6600
+        port: 6600,
     });
-    thread::spawn(move|| {
+    thread::spawn(move || {
         open(&config, app).unwrap();
     })
 }
@@ -56,43 +56,44 @@ fn handle_client(stream: TcpStream, app: &Arc<Rustic>) {
     let result = reader.get_ref().write(header.as_bytes());
     match result {
         Ok(_) => trace!("< {:?}", &header),
-        Err(e) => error!("{:?}", &e)
+        Err(e) => error!("{:?}", &e),
     }
 
     loop {
         let line = reader.by_ref().lines().next();
         match line {
             Some(line) => {
-                let res: Result<Option<()>, failure::Error> = line
-                    .map_err(failure::Error::from)
-                    .and_then(|line| {
+                let res: Result<Option<()>, failure::Error> =
+                    line.map_err(failure::Error::from).and_then(|line| {
                         trace!("> {:?}", &line);
-                        let cmd: Result<MpdCommands, failure::Error> = if line == "command_list_ok_begin" {
-                            let mut current = reader.by_ref().lines().next().expect("line").expect("line");
+                        let cmd: Result<MpdCommands, failure::Error> = if line
+                            == "command_list_ok_begin"
+                        {
+                            let mut current =
+                                reader.by_ref().lines().next().expect("line").expect("line");
                             trace!("> {:?}", &current);
                             let mut cmds: Vec<MpdCommands> = vec![];
                             while current.as_str() != "command_list_end" {
                                 if let Ok(cmd) = parse_single(&current) {
                                     cmds.push(cmd)
                                 }
-                                current = reader.by_ref().lines().next().expect("line").expect("line");
+                                current =
+                                    reader.by_ref().lines().next().expect("line").expect("line");
                                 trace!("> {:?}", &current);
                             }
                             Ok(MpdCommands::CommandList(cmds))
                         } else {
                             parse_single(&line)
                         };
-                        cmd.and_then(|cmd| {
-                            match cmd {
-                                MpdCommands::Idle => Ok(Some(())),
-                                MpdCommands::Close => Ok(None),
-                                cmd => {
-                                    let mut result = handle_mpd_command(cmd, &app)?;
-                                    result += "OK\n";
-                                    trace!("< {:?}", &result);
-                                    reader.get_ref().write_all(result.as_bytes())?;
-                                    Ok(Some(()))
-                                }
+                        cmd.and_then(|cmd| match cmd {
+                            MpdCommands::Idle => Ok(Some(())),
+                            MpdCommands::Close => Ok(None),
+                            cmd => {
+                                let mut result = handle_mpd_command(cmd, &app)?;
+                                result += "OK\n";
+                                trace!("< {:?}", &result);
+                                reader.get_ref().write_all(result.as_bytes())?;
+                                Ok(Some(()))
                             }
                         })
                     });
@@ -102,11 +103,11 @@ fn handle_client(stream: TcpStream, app: &Arc<Rustic>) {
                     Err(err) => {
                         error!("{:?}", &err);
                         break;
-                    },
+                    }
                     Ok(Some(())) => {}
                 }
-            },
-            None => break
+            }
+            None => break,
         }
     }
 
@@ -149,7 +150,6 @@ enum MpdCommands {
     Close,
 }
 
-
 fn parse_single(line: &str) -> Result<MpdCommands, failure::Error> {
     Ok(serde_mpd::from_str(line)?)
 }
@@ -157,42 +157,60 @@ fn parse_single(line: &str) -> Result<MpdCommands, failure::Error> {
 fn handle_mpd_command(cmd: MpdCommands, app: &Arc<Rustic>) -> Result<String, failure::Error> {
     debug!("Command: {:?}", &cmd);
     match cmd {
-        MpdCommands::Status => commands::StatusCommand::new().handle(app)
+        MpdCommands::Status => commands::StatusCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::CurrentSong => commands::CurrentSongCommand::new().handle(app)
+        MpdCommands::CurrentSong => commands::CurrentSongCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
         // MpdCommands::Pause(true) => commands::PauseCommand::new().handle(app)
-        MpdCommands::Pause => commands::PauseCommand::new().handle(app)
+        MpdCommands::Pause => commands::PauseCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::Play(_) => commands::PlayCommand::new().handle(app)
+        MpdCommands::Play(_) => commands::PlayCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::Stop => commands::StopCommand::new().handle(app)
+        MpdCommands::Stop => commands::StopCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::ListInfo(path) => commands::ListInfoCommand::new(path).handle(app)
+        MpdCommands::ListInfo(path) => commands::ListInfoCommand::new(path)
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::ListPlaylists => commands::ListPlaylistsCommand::new().handle(app)
+        MpdCommands::ListPlaylists => commands::ListPlaylistsCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::ListPlaylist(name) => commands::ListPlaylistCommand::new(name).handle(app)
+        MpdCommands::ListPlaylist(name) => commands::ListPlaylistCommand::new(name)
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::ListPlaylistInfo(name) => commands::ListPlaylistInfoCommand::new(name).handle(app)
+        MpdCommands::ListPlaylistInfo(name) => commands::ListPlaylistInfoCommand::new(name)
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::LoadPlaylist(name) => commands::LoadPlaylistCommand::new(name).handle(app)
+        MpdCommands::LoadPlaylist(name) => commands::LoadPlaylistCommand::new(name)
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::Previous => commands::PreviousCommand::new().handle(app)
+        MpdCommands::Previous => commands::PreviousCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::Next => commands::NextCommand::new().handle(app)
+        MpdCommands::Next => commands::NextCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::Outputs => commands::OutputsCommand::new().handle(app)
+        MpdCommands::Outputs => commands::OutputsCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::List(ref t) if t == "Artist" => commands::ListArtistCommand::new().handle(app)
+        MpdCommands::List(ref t) if t == "Artist" => commands::ListArtistCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::ChangeVolumeBy(volume) => commands::ChangeVolumeCommand::new(volume).handle(app)
+        MpdCommands::ChangeVolumeBy(volume) => commands::ChangeVolumeCommand::new(volume)
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::ChangeVolume(volume) => commands::SetVolumeCommand::new(volume).handle(app)
+        MpdCommands::ChangeVolume(volume) => commands::SetVolumeCommand::new(volume)
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::Commands => commands::CommandsCommand::new().handle(app)
+        MpdCommands::Commands => commands::CommandsCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
-        MpdCommands::TagTypes => commands::TagTypesCommand::new().handle(app)
+        MpdCommands::TagTypes => commands::TagTypesCommand::new()
+            .handle(app)
             .and_then(|res| serde_mpd::to_string(&res).map_err(failure::Error::from)),
         MpdCommands::CommandList(commands) => {
             let mut result = String::new();
@@ -202,6 +220,6 @@ fn handle_mpd_command(cmd: MpdCommands, app: &Arc<Rustic>) -> Result<String, fai
             }
             Ok(result)
         }
-        _ => Ok(String::new())
+        _ => Ok(String::new()),
     }
 }

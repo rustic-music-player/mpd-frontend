@@ -1,5 +1,5 @@
-use failure::Error;
 use commands::MpdCommand;
+use failure::Error;
 use rustic_core::Rustic;
 use std::sync::Arc;
 
@@ -10,11 +10,10 @@ pub struct OutputEntry {
     #[serde(rename = "outputname")]
     name: String,
     #[serde(rename = "outputenabled")]
-    enabled: bool
+    enabled: bool,
 }
 
-pub struct OutputsCommand {
-}
+pub struct OutputsCommand {}
 
 impl OutputsCommand {
     pub fn new() -> OutputsCommand {
@@ -24,12 +23,10 @@ impl OutputsCommand {
 
 impl MpdCommand<Vec<OutputEntry>> for OutputsCommand {
     fn handle(&self, _app: &Arc<Rustic>) -> Result<Vec<OutputEntry>, Error> {
-        Ok(vec![
-            OutputEntry {
-                id: 0,
-                name: String::from("Default"),
-                enabled: true
-            }
-        ])
+        Ok(vec![OutputEntry {
+            id: 0,
+            name: String::from("Default"),
+            enabled: true,
+        }])
     }
 }

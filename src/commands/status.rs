@@ -1,14 +1,14 @@
-use failure::Error;
 use commands::MpdCommand;
-use rustic_core::Rustic;
+use failure::Error;
 use rustic_core::player::PlayerState;
+use rustic_core::Rustic;
 use std::sync::Arc;
 
 #[derive(Debug, Serialize)]
 pub struct AudioFormat {
     samplerate: i32,
     bits: i32,
-    channels: i32
+    channels: i32,
 }
 
 #[derive(Debug, Serialize)]
@@ -21,24 +21,23 @@ pub struct StatusResponse {
     playlist: u32,
     playlistlength: usize,
     state: PlayerState,
-//    song: i32,
-//    songid: i32,
-//    nextsong: i32,
-//    nextsongid: i32,
-//    time: i32,
-//    elapsed: i32,
-//    duration: i32,
-//    bitrate: i32,
+    //    song: i32,
+    //    songid: i32,
+    //    nextsong: i32,
+    //    nextsongid: i32,
+    //    time: i32,
+    //    elapsed: i32,
+    //    duration: i32,
+    //    bitrate: i32,
     xfade: i32,
-//    mixrampdb: i32,
-//    mixrampdelay: i32,
-//    audio: AudioFormat,
-//    updating_db: i32,
-//    error: String
+    //    mixrampdb: i32,
+    //    mixrampdelay: i32,
+    //    audio: AudioFormat,
+    //    updating_db: i32,
+    //    error: String
 }
 
-pub struct StatusCommand {
-}
+pub struct StatusCommand {}
 
 impl StatusCommand {
     pub fn new() -> StatusCommand {
@@ -57,7 +56,7 @@ impl MpdCommand<StatusResponse> for StatusCommand {
             playlist: 0,
             playlistlength: app.player.get_queue().len(),
             state: app.player.state(),
-            xfade: 0
+            xfade: 0,
         })
     }
 }

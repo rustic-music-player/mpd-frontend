@@ -10,7 +10,7 @@ pub struct MpdSong {
     #[serde(rename = "Track")]
     track: usize,
     #[serde(rename = "Time")]
-    time: Option<u64>
+    time: Option<u64>,
 }
 
 impl From<Track> for MpdSong {
@@ -20,7 +20,7 @@ impl From<Track> for MpdSong {
             title: Some(track.title),
             id: track.id,
             track: 0,
-            time: track.duration
+            time: track.duration,
         }
     }
 }

@@ -1,17 +1,15 @@
-use failure::Error;
 use commands::MpdCommand;
+use failure::Error;
 use rustic_core::Rustic;
 use std::sync::Arc;
 
 pub struct SetVolumeCommand {
-    pub volume: u32
+    pub volume: u32,
 }
 
 impl SetVolumeCommand {
     pub fn new(volume: u32) -> SetVolumeCommand {
-        SetVolumeCommand {
-            volume
-        }
+        SetVolumeCommand { volume }
     }
 }
 

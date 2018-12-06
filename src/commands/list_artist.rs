@@ -1,18 +1,18 @@
-use failure::Error;
 use commands::MpdCommand;
-use rustic_core::{Rustic, Artist};
+use failure::Error;
+use rustic_core::{Artist, Rustic};
 use std::sync::Arc;
 
 #[derive(Debug, Serialize)]
 pub struct MpdArtist {
     #[serde(rename = "Artist")]
-    artist: String
+    artist: String,
 }
 
 impl From<Artist> for MpdArtist {
     fn from(artist: Artist) -> MpdArtist {
         MpdArtist {
-            artist: artist.name
+            artist: artist.name,
         }
     }
 }
@@ -34,7 +34,7 @@ impl MpdCommand<Vec<MpdArtist>> for ListArtistCommand {
             .map(MpdArtist::from)
             .collect();
         let unknown = MpdArtist {
-            artist: String::from("[unknown]")
+            artist: String::from("[unknown]"),
         };
         artists.insert(0, unknown);
         Ok(artists)

@@ -1,23 +1,23 @@
-use failure::Error;
-use commands::MpdCommand;
 use commands::list_playlists::PlaylistEntry;
+use commands::MpdCommand;
+use failure::Error;
+use rustic_core::{Explorer, Playlist, Rustic, SharedLibrary, Track};
 use song::MpdSong;
-use rustic_core::{Rustic, SharedLibrary, Explorer, Track, Playlist};
 use std::sync::Arc;
 
 #[derive(Serialize)]
 pub struct PathItem {
-    directory: String
+    directory: String,
 }
 
 pub struct ListInfoCommand {
-    path: Option<String>
+    path: Option<String>,
 }
 
 impl ListInfoCommand {
     pub fn new(path: String) -> ListInfoCommand {
         ListInfoCommand {
-            path: if path == "" { None } else { Some(path) }
+            path: if path == "" { None } else { Some(path) },
         }
     }
 
@@ -43,12 +43,9 @@ impl MpdCommand<ListInfoResponse> for ListInfoCommand {
                     .unwrap()
                     .folders
                     .iter()
-                    .map(|folder| {
-                        PathItem {
-                            directory: folder.clone()
-                        }
-                    })
-                    .collect();
+                    .map(|folder| PathItem {
+                        directory: folder.clone(),
+                    }).collect();
                 let playlists = self.get_playlists(&app.library)?;
                 Ok((folders, playlists, vec![]))
             }
@@ -60,12 +57,9 @@ impl MpdCommand<ListInfoResponse> for ListInfoCommand {
                 let folders = folder
                     .folders
                     .iter()
-                    .map(|folder| {
-                        PathItem {
-                            directory: format!("{}{}", path, folder)
-                        }
-                    })
-                    .collect();
+                    .map(|folder| PathItem {
+                        directory: format!("{}{}", path, folder),
+                    }).collect();
                 let items = folder
                     .items
                     .iter()

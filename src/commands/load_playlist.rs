@@ -1,17 +1,15 @@
-use failure::Error;
 use commands::MpdCommand;
+use failure::Error;
 use rustic_core::Rustic;
 use std::sync::Arc;
 
 pub struct LoadPlaylistCommand {
-    name: String
+    name: String,
 }
 
 impl LoadPlaylistCommand {
     pub fn new(name: String) -> LoadPlaylistCommand {
-        LoadPlaylistCommand {
-            name
-        }
+        LoadPlaylistCommand { name }
     }
 }
 

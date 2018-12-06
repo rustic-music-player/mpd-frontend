@@ -1,22 +1,21 @@
-use failure::Error;
 use commands::MpdCommand;
+use failure::Error;
 use rustic_core::Rustic;
 use std::sync::Arc;
 
 // TODO: parse MpdCommands enum
 
-pub struct CommandsCommand {
-}
+pub struct CommandsCommand {}
 
 #[derive(Serialize, Debug)]
 pub struct Command {
-    command: String
+    command: String,
 }
 
 impl Command {
     fn new(label: &'static str) -> Command {
         Command {
-            command: label.to_owned()
+            command: label.to_owned(),
         }
     }
 }

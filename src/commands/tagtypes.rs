@@ -1,20 +1,19 @@
-use failure::Error;
 use commands::MpdCommand;
+use failure::Error;
 use rustic_core::Rustic;
 use std::sync::Arc;
 
-pub struct TagTypesCommand {
-}
+pub struct TagTypesCommand {}
 
 #[derive(Serialize, Debug)]
 pub struct TagType {
-    tagtype: String
+    tagtype: String,
 }
 
 impl TagType {
     fn new(label: &'static str) -> TagType {
         TagType {
-            tagtype: label.to_owned()
+            tagtype: label.to_owned(),
         }
     }
 }
@@ -27,8 +26,6 @@ impl TagTypesCommand {
 
 impl MpdCommand<Vec<TagType>> for TagTypesCommand {
     fn handle(&self, _app: &Arc<Rustic>) -> Result<Vec<TagType>, Error> {
-        Ok(vec![
-            TagType::new("Track"),
-        ])
+        Ok(vec![TagType::new("Track")])
     }
 }

@@ -1,11 +1,10 @@
-use failure::Error;
 use commands::MpdCommand;
-use song::MpdSong;
+use failure::Error;
 use rustic_core::Rustic;
+use song::MpdSong;
 use std::sync::Arc;
 
-pub struct CurrentSongCommand {
-}
+pub struct CurrentSongCommand {}
 
 impl CurrentSongCommand {
     pub fn new() -> CurrentSongCommand {
@@ -15,9 +14,7 @@ impl CurrentSongCommand {
 
 impl MpdCommand<Option<MpdSong>> for CurrentSongCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<Option<MpdSong>, Error> {
-        let track = app.player
-            .current()
-            .map(|track| MpdSong::from(track));
+        let track = app.player.current().map(|track| MpdSong::from(track));
         Ok(track)
     }
 }

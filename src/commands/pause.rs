@@ -1,10 +1,9 @@
-use failure::Error;
 use commands::MpdCommand;
-use rustic_core::{Rustic, player::PlayerState};
+use failure::Error;
+use rustic_core::{player::PlayerState, Rustic};
 use std::sync::Arc;
 
-pub struct PauseCommand {
-}
+pub struct PauseCommand {}
 
 impl PauseCommand {
     pub fn new() -> PauseCommand {

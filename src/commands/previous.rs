@@ -1,10 +1,9 @@
-use failure::Error;
 use commands::MpdCommand;
+use failure::Error;
 use rustic_core::Rustic;
 use std::sync::Arc;
 
-pub struct PreviousCommand {
-}
+pub struct PreviousCommand {}
 
 impl PreviousCommand {
     pub fn new() -> PreviousCommand {
@@ -14,7 +13,6 @@ impl PreviousCommand {
 
 impl MpdCommand<()> for PreviousCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<(), Error> {
-        app.player.prev()
-            .map(|_| ())
+        app.player.prev().map(|_| ())
     }
 }
