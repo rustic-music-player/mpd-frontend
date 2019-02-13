@@ -14,7 +14,7 @@ impl CurrentSongCommand {
 
 impl MpdCommand<Option<MpdSong>> for CurrentSongCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<Option<MpdSong>, Error> {
-        let track = app.player.current().map(|track| MpdSong::from(track));
+        let track = app.player.current().map(MpdSong::from);
         Ok(track)
     }
 }
