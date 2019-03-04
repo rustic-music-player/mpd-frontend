@@ -23,7 +23,8 @@ impl MpdCommand<()> for LoadPlaylistCommand {
             .cloned()
             .unwrap()
             .tracks;
-        app.player.queue_multiple(&tracks);
+        let player = app.get_default_player().ok_or(format_err!("Missing default player"))?;
+        player.queue_multiple(&tracks);
         Ok(())
     }
 }

@@ -13,6 +13,7 @@ impl NextCommand {
 
 impl MpdCommand<()> for NextCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<(), Error> {
-        app.player.next().map(|_| ())
+        let player = app.get_default_player().ok_or(format_err!("Missing default player"))?;
+        player.next().map(|_| ())
     }
 }

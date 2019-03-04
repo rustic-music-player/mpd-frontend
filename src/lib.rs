@@ -5,6 +5,7 @@ extern crate rustic_core;
 extern crate serde_mpd;
 #[macro_use]
 extern crate log;
+#[macro_use]
 extern crate failure;
 
 mod commands;

@@ -47,15 +47,16 @@ impl StatusCommand {
 
 impl MpdCommand<StatusResponse> for StatusCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<StatusResponse, Error> {
+        let player = app.get_default_player().ok_or(format_err!("Missing default player"))?;
         Ok(StatusResponse {
-            volume: (app.player.volume() * 100f32) as u32,
+            volume: (player.volume() * 100f32) as u32,
             repeat: false,
             random: false,
             single: false,
             consume: false,
             playlist: 0,
-            playlistlength: app.player.get_queue().len(),
-            state: app.player.state(),
+            playlistlength: player.get_queue().len(),
+            state: player.state(),
             xfade: 0,
         })
     }

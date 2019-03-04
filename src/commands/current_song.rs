@@ -14,7 +14,8 @@ impl CurrentSongCommand {
 
 impl MpdCommand<Option<MpdSong>> for CurrentSongCommand {
     fn handle(&self, app: &Arc<Rustic>) -> Result<Option<MpdSong>, Error> {
-        let track = app.player.current().map(MpdSong::from);
+        let player = app.get_default_player().ok_or(format_err!("Missing default player"))?;
+        let track = player.current().map(MpdSong::from);
         Ok(track)
     }
 }
